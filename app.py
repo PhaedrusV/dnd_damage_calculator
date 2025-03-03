@@ -4,14 +4,23 @@ import plotly
 import json
 import numpy as np
 import os
+import logging
+
+# Configure logging
+logging.basicConfig(level=logging.DEBUG)
+logger = logging.getLogger(__name__)
+logger.debug("Starting app.py")
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'your-secret-key'
+logger.debug("Flask app initialized")
 
 def expected_die_value(num_dice, die_size):
+    logger.debug(f"Calculating expected_die_value: num_dice={num_dice}, die_size={die_size}")
     return num_dice * (die_size + 1) / 2 if num_dice > 0 and die_size > 0 else 0
 
 def calculate_damage(to_hit, x, y, v, w, z, sharpshooter=False, advantage=False, disadvantage=False):
+    logger.debug(f"Calculating damage: to_hit={to_hit}, x={x}, y={y}, v={v}, w={w}, z={z}, sharpshooter={sharpshooter}, advantage={advantage}, disadvantage={disadvantage}")
     normal_dice = expected_die_value(x, y) + expected_die_value(v, w)
     crit_dice = 2 * (expected_die_value(x, y) + expected_die_value(v, w))
     static_bonus = z + (10 if sharpshooter else 0)
@@ -36,6 +45,7 @@ def calculate_damage(to_hit, x, y, v, w, z, sharpshooter=False, advantage=False,
     return p_normal_hit * (normal_dice + static_bonus) + p_crit * (crit_dice + static_bonus)
 
 def sanitize_input(value, min_val, max_val, default=0):
+    logger.debug(f"Sanitizing input: value={value}, min_val={min_val}, max_val={max_val}, default={default}")
     try:
         val = int(value)
         return max(min_val, min(val, max_val))
@@ -44,6 +54,7 @@ def sanitize_input(value, min_val, max_val, default=0):
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
+    logger.debug("Handling request to /")
     x, y, v, w, z = 1, 8, 0, 0, 4
     advantage, disadvantage = False, False
 
@@ -56,10 +67,12 @@ def index():
         advantage = 'advantage' in request.form
         disadvantage = 'disadvantage' in request.form
 
-    to_hit_range = np.arange(2, 21, 1)
+    logger.debug("Calculating damages")
+    to_hit_range = np.arange(2, 21, 2)  # Reduced points for memory
     base_damages = [calculate_damage(t, x, y, v, w, z, False, advantage, disadvantage) for t in to_hit_range]
     sharp_damages = [calculate_damage(t, x, y, v, w, z, True, advantage, disadvantage) for t in to_hit_range]
 
+    logger.debug("Creating Plotly figure")
     fig = go.Figure()
     fig.add_trace(go.Scatter(x=to_hit_range, y=base_damages, mode='lines', name='Base Damage', line=dict(color='blue')))
     fig.add_trace(go.Scatter(x=to_hit_range, y=sharp_damages, mode='lines', name='Sharpshooter', 
@@ -73,7 +86,9 @@ def index():
         template='plotly_white'
     )
 
+    logger.debug("Converting figure to JSON")
     graph_json = json.dumps(fig, cls=plotly.utils.PlotlyJSONEncoder)
+    logger.debug("Rendering template")
     return render_template('index.html', graph_json=graph_json, x=x, y=y, v=v, w=w, z=z, 
                           advantage=advantage, disadvantage=disadvantage)
 
