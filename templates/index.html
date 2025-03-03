@@ -1,0 +1,39 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>D&D 5e Damage Calculator</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>D&D 5e Damage Calculator</h1>
+        <form method="POST">
+            <label>Damage (e.g., 1d8+2d6+4):</label><br>
+            <label>X (num dice):</label>
+            <input type="number" name="x" value="{{ x }}" min="0"><br>
+            <label>Y (die size):</label>
+            <input type="number" name="y" value="{{ y }}" min="0"><br>
+            <label>V (num dice):</label>
+            <input type="number" name="v" value="{{ v }}" min="0"><br>
+            <label>W (die size):</label>
+            <input type="number" name="w" value="{{ w }}" min="0"><br>
+            <label>Z (bonus):</label>
+            <input type="number" name="z" value="{{ z }}" min="0"><br>
+            <input type="checkbox" name="advantage" {% if advantage %}checked{% endif %}>
+            <label>Advantage</label><br>
+            <input type="checkbox" name="disadvantage" {% if disadvantage %}checked{% endif %}>
+            <label>Disadvantage</label><br>
+            <input type="submit" value="Update">
+        </form>
+        <div id="plotly-graph"></div>
+    </div>
+
+    <script>
+        var graphData = {{ graph_json | safe }};
+        Plotly.newPlot('plotly-graph', graphData.data, graphData.layout);
+    </script>
+</body>
+</html>
