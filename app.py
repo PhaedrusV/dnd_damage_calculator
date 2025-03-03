@@ -6,7 +6,6 @@ import numpy as np
 import os
 import logging
 
-# Configure logging
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 logger.debug("Starting app.py")
@@ -68,7 +67,7 @@ def index():
         disadvantage = 'disadvantage' in request.form
 
     logger.debug("Calculating damages")
-    to_hit_range = np.arange(2, 21, 2)  # Reduced points for memory
+    to_hit_range = np.arange(2, 21, 2)
     base_damages = [calculate_damage(t, x, y, v, w, z, False, advantage, disadvantage) for t in to_hit_range]
     sharp_damages = [calculate_damage(t, x, y, v, w, z, True, advantage, disadvantage) for t in to_hit_range]
 
