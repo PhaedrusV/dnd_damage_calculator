@@ -3,7 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <title>D&D 5e Damage Calculator</title>
-    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
@@ -27,12 +26,7 @@
             <label>Disadvantage</label><br>
             <input type="submit" value="Update">
         </form>
-        <div id="plotly-graph"></div>
+        <p>Plotly graph temporarily disabled for debugging.</p>
     </div>
-
-    <script>
-        var graphData = {{ graph_json | safe }};
-        Plotly.newPlot('plotly-graph', graphData.data, graphData.layout);
-    </script>
 </body>
 </html>
