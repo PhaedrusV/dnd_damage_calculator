@@ -1,3 +1,17 @@
+from flask import Flask
+
+app = Flask(__name__)
+
+@app.route('/')
+def index():
+    return "Hello, Heroku! If you see this, the app is running."
+
+if __name__ == '__main__':
+    import os
+    port = int(os.environ.get('PORT', 5000))
+    app.run(host='0.0.0.0', port=port, debug=True)
+
+"""
 from flask import Flask, render_template, request
 import plotly.graph_objects as go
 import plotly
@@ -85,3 +99,4 @@ def index():
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))  # Use Heroku's PORT or default to 5000
     app.run(host='0.0.0.0', port=port, debug=True)  # Bind to 0.0.0.0 for Heroku
+"""
